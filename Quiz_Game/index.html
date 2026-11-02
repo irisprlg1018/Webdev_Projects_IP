@@ -8,6 +8,8 @@
     <script src="script.js" defer></script>
   </head>
   <body>
+    
+    <!--Main Screen -->
     <div class="container">
       <div class="screen active" id="start-screen">
         <h1>Test your knowledge</h1>
@@ -17,15 +19,39 @@
         <button id="start-btn">Start Quiz</button>
       </div>
 
+      <!-- Quiz Screen -->
       <div class=""screen id=""quiz-screen">
+        <div class="quiz-header">
+          <h1>Quiz Game</h1>
       <h2 id="question">Question</h2>
       <div class=""quiz-options">
         <p>
             Question <span id="current-question">1</span> of <span></span>
         </p>
-    </div>
-</div>
-    </div>
 
+        <p>
+            Score: <span id="score">0</span>
+        </p>
+        </div>
+        </div>
+        <div id="answer-container" class="answer-container">
+          <!-- Answer buttons will be insterted from js-->
+        </div>
+        <div class=""progress-bar">
+          <div id=""progress" class="progress"></div>
+    </div>
+    
+    <!-- Result Screen -->
+    <div id=""result-screen" class="result-screen">
+        <h1>Quiz Results</h1>
+        <div class="result-details">
+        <p> You scored <span id="final-score">0</span> out of <span id="total-questions">0</span> questions correctly.</p>
+    
+        <div id="result-message" class="result-message">Great Job!</div>
+    </div>
+    <!-- Restart Button -->
+    <button id="restart-btn">Restart Quiz</button>
+    </div>
+    </div>
   </body>
 </html>
