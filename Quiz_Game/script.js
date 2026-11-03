@@ -1,8 +1,10 @@
-//DOM Elements
+// DOM ELEMENTS
+
 const startScreen = document.getElementById("start-screen");
 const quizScreen = document.getElementById("quiz-screen");
 const resultScreen = document.getElementById("result-screen");
 const startBtn = document.getElementById("start-btn");
+const restartBtn = document.getElementById("restart-btn");
 const questionText = document.getElementById("question");
 const answerContainer = document.getElementById("answer-container");
 const currentQuestionText = document.getElementById("current-question");
@@ -11,9 +13,7 @@ const scoreText = document.getElementById("score");
 const finalScoreText = document.getElementById("final-score");
 const maxScoreText = document.getElementById("max-score");
 const resultMessageText = document.getElementById("result-message");
-const resultButton = document.getElementById("result-btn");
 const progressBar = document.getElementById("progress");
-const restartBtn = document.getElementById("restart-btn");
 
 const quizQuestions = [
   {
@@ -63,23 +63,28 @@ const quizQuestions = [
   },
 ];
 
-//Quiz State Vars
-let currentQuestionIndex = 0; //starting from the very first question
+// Quiz state variables
+
+let currentQuestionIndex = 0; //this starts from the very first question
 let score = 0;
 let answersDisabled = false; //to prevent multiple answers being selected
 
+// Display total questions
 totalQuestionsText.textContent = quizQuestions.length; //display total number of questions
-//maxScoreText.textContent = quizQuestions.length; //display max score
+maxScoreText.textContent = quizQuestions.length; //display max score
 
 //Event Listeners
 
 startBtn.addEventListener("click", startQuiz); //this will allow the user to start the quiz when they click the start button
 restartBtn.addEventListener("click", restartQuiz); //this will allow the user to restart the quiz when they click the restart button
 
+// START QUIZ
+
 function startQuiz() {
-  //reset vars
   currentQuestionIndex = 0;
   score = 0;
+
+  scoreText.textContent = score;
 
   startScreen.classList.remove("active");
   quizScreen.classList.add("active");
@@ -87,32 +92,107 @@ function startQuiz() {
   showQuestion();
 }
 
+// SHOW QUESTION
+
 function showQuestion() {
-  //reset state
   answersDisabled = false;
 
   const currentQuestion = quizQuestions[currentQuestionIndex];
 
   currentQuestionText.textContent = currentQuestionIndex + 1; //display current question number
 
+  // Update progress bar
   const progressPercentage =
-    ((currentQuestionIndex + 1) / quizQuestions.length) * 100;
+    (currentQuestionIndex / quizQuestions.length) * 100;
+  progressBar.style.width = progressPercentage + "%";
 
-  progressBar.style.width = `${progressPercentage}%`;
-
+  // Display question
   questionText.textContent = currentQuestion.question;
 
-  answerContainer.innerHTML = ""; //clear previous answers
+  // Clear previous answers
+  answerContainer.innerHTML = "";
 
+  // Create answer buttons
   currentQuestion.answers.forEach((answer) => {
     const button = document.createElement("button");
+
     button.textContent = answer.text;
     button.classList.add("answer-btn");
-    button.addEventListener("click", () => selectAnswer(answer));
+
+    //this store the correct answer in the button's dataset
+    button.dataset.correct = answer.correct;
+
+    button.addEventListener("click", selectAnswer);
+
     answerContainer.appendChild(button);
   });
 }
 
+//Select Answer
+
+function selectAnswer(e) {
+  if (answersDisabled) return; //this will prevent multiple answers being selected
+
+  answersDisabled = true;
+
+  const selectedButton = e.currentTarget;
+  const correct = selectedButton.dataset.correct === "true"; //this check if the selected answer is correct
+
+  // this highlights selected and correct answers
+  Array.from(answerContainer.children).forEach((button) => {
+    if (button.dataset.correct === "true") {
+      button.classList.add("correct");
+    } else if (button === selectedButton) {
+      button.classList.add("incorrect");
+    }
+
+    button.disabled = true; //this disables all answer buttons
+  });
+
+  //Update score in the display window
+  if (correct) {
+    score++;
+    scoreText.textContent = score;
+  }
+
+  //Move to the next question
+  setTimeout(() => {
+    currentQuestionIndex++;
+
+    //to check if there are more questions or if quiz is completed
+    if (currentQuestionIndex < quizQuestions.length) {
+      showQuestion();
+    } else {
+      showResult();
+    }
+  }, 1000);
+}
+
+//Show Result
+
+function showResult() {
+  quizScreen.classList.remove("active");
+  resultScreen.classList.add("active");
+
+  finalScoreText.textContent = score;
+
+  const percentage = (score / quizQuestions.length) * 100;
+
+  if (percentage >= 80) {
+    resultMessageText.textContent = "Excellent work!";
+  } else if (percentage >= 50) {
+    resultMessageText.textContent = "Good job!";
+  } else if (percentage >= 30) {
+    resultMessageText.textContent = "Keep Going!";
+  } else {
+    resultMessageText.textContent = "Try Again!";
+  }
+} //this shows result in the screen after completing the quiz
+
+//Restart Quiz
+
 function restartQuiz() {
-  console.log("Quiz restarted");
+  resultScreen.classList.remove("active");
+
+  startQuiz(); ///this restarts the quiz again
 }
